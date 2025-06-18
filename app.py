@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import st_aggrid as AgGrid
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
