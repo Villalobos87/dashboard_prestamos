@@ -101,8 +101,6 @@ st.subheader("  Detalle de Préstamos ")
 
 # Construir opciones del grid
 gb = GridOptionsBuilder.from_dataframe(df_pendiente)
-gb.configure_default_column(resizable=True,filter=True, sortable=True) 
-AgGrid(df_pendiente,grid_options=gb.build(),height=300)
 
 # Ajuste manual de ancho para una columna especifica
 gb.configure_column("Nombre y Apellido", width=750)
