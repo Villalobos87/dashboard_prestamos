@@ -92,6 +92,8 @@ st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostra
 
 # --- Tabla ---
 
+df_pendiente = df[df["Estado"]=="Pendiente"]
+
 from st_aggrid import AgGrid, GridOptionsBuilder
 
 st.subheader("  Detalle de Préstamos ")
