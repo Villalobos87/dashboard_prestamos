@@ -147,6 +147,8 @@ AgGrid(
 # --- Métricas ---
 # Calcular totales
 
+st.write("Columnas disponibles:",df.columns.tolist())
+
 total_cuota_cancelada = df[df["Estado"]=="Cancelado"]["Cuota"].sum()
 Capital_Inicial = 9000
 Ganancias_Entregadas =3698.24
