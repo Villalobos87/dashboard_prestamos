@@ -154,6 +154,9 @@ Efectivo = total_cuota_cancelada + Capital_Inicial - total_prestado - Ganancias_
 Pendiente_Recuperar = df[df["Estado"].str.strip().str.capitalize()=="Pendiente"]["Total Cuota"].sum()
 
 # Crear columnas
+
+st.markdown()
+
 col1, col2, col3, col4 = st.columns(4)
 
 # Mostrar tarjetas estilo Power BI
