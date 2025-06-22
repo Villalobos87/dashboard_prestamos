@@ -147,10 +147,11 @@ AgGrid(
 # --- Métricas ---
 # Calcular totales
 
-total_prestado = df_filtrado['Principal'].sum()
-total_interes = df_filtrado['Interes'].sum()
-total_comision = df_filtrado['Comisión'].sum()
-ganancias_proyectadas = total_interes + total_comision
+total_cuota_cancelada = df[df["Estado"].str.strip().str.capitalize()=="Cancelado"]["Total Cuota"].sum()
+Capital_Inicial = 9000
+Ganancias_Entregadas =3698.24
+Efectivo = total_cuota_cancelada + Capital_Inicial - total_prestado - Ganancias_Entregadas
+Pendiente_Recuperar = df[df["Estado"].str.strip().str.capitalize()=="Pendiente"]["Total Cuota"].sum()
 
 # Crear columnas
 col1, col2, col3, col4 = st.columns(4)
@@ -158,29 +159,29 @@ col1, col2, col3, col4 = st.columns(4)
 # Mostrar tarjetas estilo Power BI
 col1.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Total Prestado</h4>
-        <p style="font-size:22px;font-weight:bold;color:#2E86C1;">${total_prestado:,.2f}</p>
+        <h4>Yanina Orochena</h4>
+        <p style="font-size:22px;font-weight:bold;color:#2E86C1;">${Efectivo:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
 col2.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Total Interés</h4>
-        <p style="font-size:22px;font-weight:bold;color:#27AE60;">${total_interes:,.2f}</p>
+        <h4>Saldo</h4>
+        <p style="font-size:22px;font-weight:bold;color:#27AE60;">${Pendiente_Recuperar:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
 col3.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Total Comisión</h4>
-        <p style="font-size:22px;font-weight:bold;color:#E67E22;">${total_comision:,.2f}</p>
+        <h4>Capital</h4>
+        <p style="font-size:22px;font-weight:bold;color:#E67E22;">${Capital_Inicial:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
 col4.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Ganancias Totales</h4>
-        <p style="font-size:22px;font-weight:bold;color:#8E44AD;">${ganancias_proyectadas:,.2f}</p>
+        <h4>Entregado</h4>
+        <p style="font-size:22px;font-weight:bold;color:#8E44AD;">${Ganancias_Entregadas:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
