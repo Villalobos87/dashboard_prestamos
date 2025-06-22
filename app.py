@@ -92,6 +92,7 @@ st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostra
 
 # --- Tabla ---
 
+# Filtrar solo los prestamos pendientes
 df_pendiente = df[df["Estado"]=="Pendiente"]
 
 from st_aggrid import AgGrid, GridOptionsBuilder
@@ -99,7 +100,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 st.subheader("  Detalle de Préstamos ")
 
 # Construir opciones del grid
-gb = GridOptionsBuilder.from_dataframe(df_filtrado)
+gb = GridOptionsBuilder.from_dataframe(df_pendiente)
 
 # Ajuste manual de ancho para una columna especifica
 gb.configure_column("Nombre y Apellido", width=750)
