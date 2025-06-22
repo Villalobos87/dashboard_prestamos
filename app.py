@@ -147,11 +147,11 @@ AgGrid(
 # --- Métricas ---
 # Calcular totales
 
-total_cuota_cancelada = df[df["Estado"].str.strip().str.capitalize()=="Cancelado"]["Total Cuota"].sum()
+total_cuota_cancelada = df[df["Estado"].str.strip().str.capitalize()=="Cancelado"]["Cuota"].sum()
 Capital_Inicial = 9000
 Ganancias_Entregadas =3698.24
 Efectivo = total_cuota_cancelada + Capital_Inicial - total_prestado - Ganancias_Entregadas
-Pendiente_Recuperar = df[df["Estado"].str.strip().str.capitalize()=="Pendiente"]["Total Cuota"].sum()
+Pendiente_Recuperar = df[df["Estado"].str.strip().str.capitalize()=="Pendiente"]["Cuota"].sum()
 
 # Crear columnas
 
