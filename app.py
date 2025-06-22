@@ -151,7 +151,7 @@ total_cuota_cancelada = df[df["Estado"]=="Cancelado"]["Cuota"].sum()
 Capital_Inicial = 9000
 Ganancias_Entregadas =3698.24
 Efectivo = total_cuota_cancelada + Capital_Inicial - total_prestado - Ganancias_Entregadas
-Pendiente_Recuperar = df[df["Estado"].str.strip().str.capitalize()=="Pendiente"]["Cuota"].sum()
+Pendiente_Recuperar = df[df["Estado"]=="Pendiente"]["Cuota"].sum()
 
 # Crear columnas
 
