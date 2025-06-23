@@ -45,15 +45,15 @@ col1.markdown(f"""
 
 col2.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Total Interés</h4>
-        <p style="font-size:22px;font-weight:bold;color:#27AE60;">${total_interes:,.2f}</p>
+        <h4>Total Comisión</h4>
+        <p style="font-size:22px;font-weight:bold;color:#27AE60;">${total_comision:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
 col3.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Total Comisión</h4>
-        <p style="font-size:22px;font-weight:bold;color:#E67E22;">${total_comision:,.2f}</p>
+        <h4>TTotal Interés</h4>
+        <p style="font-size:22px;font-weight:bold;color:#E67E22;">${total_interes:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
 
