@@ -169,7 +169,7 @@ col1.markdown(f"""
 
 col2.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Saldo</h4>
+        <h4>Por Recuperar</h4>
         <p style="font-size:22px;font-weight:bold;color:#27AE60;">${Pendiente_Recuperar:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
@@ -183,7 +183,7 @@ col3.markdown(f"""
 
 col4.markdown(f"""
     <div style="background-color:#F0F2F6;padding:20px;border-radius:12px;text-align:center;box-shadow:2px 2px 10px rgba(0,0,0,0.1);">
-        <h4>Entregado</h4>
+        <h4>Rodrigo Gurdian</h4>
         <p style="font-size:22px;font-weight:bold;color:#8E44AD;">${Ganancias_Entregadas:,.2f}</p>
     </div>
 """, unsafe_allow_html=True)
