@@ -208,7 +208,7 @@ gb.configure_default_column(
     )
 
     #  Agrupación forzada en orden deseado
-gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0,width=750)
+gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
 gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
 gb.configure_column("Cuota", value=True, aggFunc="sum")
 
