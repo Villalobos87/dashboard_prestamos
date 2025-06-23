@@ -104,7 +104,7 @@ gb = GridOptionsBuilder.from_dataframe(df_pendiente)
 
 # Ajuste manual de ancho para una columna especifica
 gb.configure_column("Nombre y Apellido", width=750)
-gb.configure_column("# de Cuota", width=200)
+gb.configure_column("#", width=200)
 gb.configure_column("Principal", width=200)
 gb.configure_column("Comisión", width=200)
 gb.configure_column("Interes", width=200)
