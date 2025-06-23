@@ -196,16 +196,12 @@ tab1, tab2, tab3 = st.tabs(["📈 Dashboard", "📋 Detalle de Préstamos", "�
 with tab3:
     st.subheader("  Pivot Grid Estilo DevExpress")
 
-    # Filtrar solo "Pendiente"
+    # Filtrar Estado Pendiente
     df_pivot = df[df["Estado"] == "Pendiente"].copy()
-
-    # Asegurar que "Cuota" es numérico
     df_pivot["Cuota"] = pd.to_numeric(df_pivot["Cuota"], errors="coerce")
 
-    # Construir configuración del Pivot Grid
     gb_pivot = GridOptionsBuilder.from_dataframe(df_pivot)
 
-    # Activar funcionalidades de Pivot
     gb_pivot.configure_default_column(
         enablePivot=True,
         enableValue=True,
@@ -215,19 +211,17 @@ with tab3:
         resizable=True
     )
 
-    # Definir columnas específicas como agrupadores
-    gb_pivot.configure_column("Campus", rowGroup=True)
-    gb_pivot.configure_column("Nombre y Apellido", rowGroup=True)
+    #  Forzar orden con rowGroupIndex
+    gb_pivot.configure_column("Campus", rowGroup=True, rowGroupIndex=0)  # Primero Campus
+    gb_pivot.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)  # Luego Nombre
+
     gb_pivot.configure_column("Cuota", value=True, aggFunc="sum")
 
-    # Ocultar columnas agrupadas del listado
     gb_pivot.configure_columns(["Estado", "Fecha", "Principal", "Interes", "Comisión"], hide=True)
-
-    gb_pivot.configure_side_bar()  # Barra lateral con Pivot, Columnas y Filtros
+    gb_pivot.configure_side_bar()
 
     pivot_options = gb_pivot.build()
 
-    # Mostrar Pivot
     AgGrid(
         df_pivot,
         gridOptions=pivot_options,
@@ -236,5 +230,3 @@ with tab3:
         height=600,
         theme="alpine"
     )
-
-
