@@ -194,6 +194,7 @@ tab1, tab2, tab3 = st.tabs(["📈 Dashboard", "📋 Detalle de Préstamos", "�
 
 
 with tab3:
+    
     st.subheader("📊 Pivot Grid Estilo DevExpress")
 
     gb_pivot = GridOptionsBuilder.from_dataframe(df)
