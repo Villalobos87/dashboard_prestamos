@@ -190,19 +190,15 @@ col4.markdown(f"""
 
 # --- TAB 3: PIVOT GRID ---
 
-tab1, tab2, tab3 = st.tabs(["📈 Dashboard", "📋 Detalle de Préstamos", "📊 Pivot Grid"])
+st.subheader("📊 Pivot Grid")
 
+df_pivot = df[df["Estado"] == "Pendiente"].copy()
+df_pivot["Cuota"] = pd.to_numeric(df_pivot["Cuota"], errors="coerce")
 
-with tab3:
-    st.subheader("  Pivot Grid Estilo DevExpress")
+    # Construcción del grid
+gb = GridOptionsBuilder.from_dataframe(df_pivot)
 
-    # Filtrar Estado Pendiente
-    df_pivot = df[df["Estado"] == "Pendiente"].copy()
-    df_pivot["Cuota"] = pd.to_numeric(df_pivot["Cuota"], errors="coerce")
-
-    gb_pivot = GridOptionsBuilder.from_dataframe(df_pivot)
-
-    gb_pivot.configure_default_column(
+gb.configure_default_column(
         enablePivot=True,
         enableValue=True,
         enableRowGroup=True,
@@ -211,22 +207,28 @@ with tab3:
         resizable=True
     )
 
-    #  Forzar orden con rowGroupIndex
-    gb_pivot.configure_column("Campus", rowGroup=True, rowGroupIndex=0)  # Primero Campus
-    gb_pivot.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)  # Luego Nombre
+    #  Agrupación forzada en orden deseado
+gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
+gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
+gb.configure_column("Cuota", value=True, aggFunc="sum")
 
-    gb_pivot.configure_column("Cuota", value=True, aggFunc="sum")
+    #  Establecer orden de columnas explícito (muy importante)
+gb.configure_column("Campus", pinned="left")
+gb.configure_column("Nombre y Apellido", pinned="left")
+gb.configure_column("Cuota", pinned=None)
 
-    gb_pivot.configure_columns(["Estado", "Fecha", "Principal", "Interes", "Comisión"], hide=True)
-    gb_pivot.configure_side_bar()
+    # Ocultar lo que no se usa
+gb.configure_columns(["Estado", "Fecha", "Principal", "Interes", "Comisión"], hide=True)
 
-    pivot_options = gb_pivot.build()
+gb.configure_side_bar()
+grid_options = gb.build()
 
-    AgGrid(
+AgGrid(
         df_pivot,
-        gridOptions=pivot_options,
+        gridOptions=grid_options,
         enable_enterprise_modules=True,
+        allow_unsafe_jscode=True,  # importante para funcionalidades avanzadas
         fit_columns_on_grid_load=True,
-        height=600,
-        theme="alpine"
+        theme="alpine",
+        height=600
     )
