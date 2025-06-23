@@ -93,7 +93,8 @@ st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostra
 # --- Tabla ---
 
 # Filtrar solo los prestamos pendientes
-df_pendiente = df[df["Estado"]=="Pendiente"]
+df_pendiente = df[df["Estado"]=="Pendiente"].copy()
+
 
 from st_aggrid import AgGrid, GridOptionsBuilder
 
