@@ -125,6 +125,19 @@ gb.configure_default_column(
     resizable=True,  #  Ajustable
     editable=False
 )
+
+
+# Filtro por defecto: Estado = Pendiente
+default_filter = {
+    "Estado": {
+        "filterType": "text",
+        "type": "equals",
+        "filter": "Pendiente"
+    }
+}
+
+
+
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 gb.configure_side_bar()  # Agrega barra lateral con filtros
 
