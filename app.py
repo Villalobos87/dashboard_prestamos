@@ -188,3 +188,35 @@ col4.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
+# --- TAB 3: PIVOT GRID ---
+
+tab1, tab2, tab3 = st.tabs(["📈 Dashboard", "📋 Detalle de Préstamos", "📊 Pivot Grid"])
+
+
+with tab3:
+    st.subheader("📊 Pivot Grid Estilo DevExpress")
+
+    gb_pivot = GridOptionsBuilder.from_dataframe(df)
+
+    gb_pivot.configure_default_column(
+        enablePivot=True,
+        enableValue=True,
+        enableRowGroup=True,
+        editable=False,
+        filter=True,
+        sortable=True,
+        resizable=True
+    )
+    gb_pivot.configure_side_bar()
+
+    pivot_options = gb_pivot.build()
+
+    AgGrid(
+        df,
+        gridOptions=pivot_options,
+        enable_enterprise_modules=True,
+        fit_columns_on_grid_load=True,
+        height=600,
+        theme="alpine"
+    )
+
