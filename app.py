@@ -89,6 +89,8 @@ fig_bar.update_traces(texttemplate="%{text:,.2f}", textposition="outside")
 fig_bar.update_layout(height=500)
 st.plotly_chart(fig_bar, use_container_width=True)
 
+fig_bar.update_layout(showlegend=False, coloraxis_showscale=False)
+
 st.markdown("---")
 
 # --- MÉTRICAS ADICIONALES ---
