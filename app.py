@@ -42,7 +42,7 @@ col4.metric("Ganancias Totales", f"${ganancias_proyectadas:,.2f}")
 
 st.markdown("---")
 
-# --- Meses en español sin usar locale ---
+# --- Meses en español ---
 meses_ingles = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"]
 meses_espanol = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -92,6 +92,53 @@ col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
+# --- Tabla detallada de préstamos (simplificada) ---
+st.subheader("📋 Detalle de Préstamos")
+df_detalle = df_filtrado.copy()
+cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
+df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
+
+gb = GridOptionsBuilder.from_dataframe(df_detalle)
+gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
+
+cell_style = JsCode("""
+function(params) {
+    if (params.value === 'Pendiente') {
+        return {'backgroundColor':'#FFF3CD','color':'#856404'};
+    } else if (params.value === 'Cancelado') {
+        return {'backgroundColor':'#D4EDDA','color':'#155724'};
+    }
+}
+""")
+gb.configure_column("Estado", cellStyle=cell_style)
+gb.configure_side_bar()
+gb.configure_pagination(paginationPageSize=20)
+grid_options = gb.build()
+
+AgGrid(df_detalle, gridOptions=grid_options, enable_enterprise_modules=True,
+       allow_unsafe_jscode=True, fit_columns_on_grid_load=True, theme='alpine', height=500)
+
+st.markdown("---")
+
+# --- Tabla resumen por campus: cuotas pendientes ---
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus")
+df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
+resumen_campus = df_pendientes.groupby("Campus").agg(
+    Cantidad_Cuotas_Pendientes=("Cuota", "count"),
+    Total_Cuotas_Pendientes=("Cuota", "sum")
+).reset_index()
+
+gb = GridOptionsBuilder.from_dataframe(resumen_campus)
+gb.configure_default_column(filter=True, sortable=True, resizable=True)
+gb.configure_column("Campus", pinned="left")
+gb.configure_side_bar()
+grid_options = gb.build()
+
+AgGrid(resumen_campus, gridOptions=grid_options, enable_enterprise_modules=True,
+       fit_columns_on_grid_load=True, theme='alpine', height=400)
+
+st.markdown("---")
+
 # --- Gráfico de pastel: Ganancias por Campus simplificado ---
 ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
 ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
@@ -104,62 +151,11 @@ fig_pie = px.pie(
     color_discrete_sequence=px.colors.qualitative.Pastel,
     hole=0
 )
-
-# Mostrar valor y porcentaje en el gráfico
 fig_pie.update_traces(
     texttemplate="%{label}: %{value:,.2f} (%{percent})",
     textfont=dict(size=14, color='black'),
     pull=[0.05]*len(ganancias_campus),
     hovertemplate="%{label}<br>Ganancias: %{value:,.2f}<br>%{percent}"
 )
-
-fig_pie.update_layout(
-    title=dict(font=dict(size=24)),
-    height=700,
-)
-
+fig_pie.update_layout(title=dict(font=dict(size=24)), height=700)
 st.plotly_chart(fig_pie, use_container_width=True)
-
-# --- Tabla detallada con AgGrid (simplificada) ---
-st.subheader("📋 Detalle de Préstamos")
-df_detalle = df_filtrado.copy()
-
-# Ocultar columnas innecesarias
-cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
-df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
-
-gb = GridOptionsBuilder.from_dataframe(df_detalle)
-gb.configure_default_column(
-    filter=True,
-    sortable=True,
-    resizable=True,
-    editable=False
-)
-
-# Resaltado condicional por estado
-cell_style = JsCode("""
-function(params) {
-    if (params.value === 'Pendiente') {
-        return {'backgroundColor':'#FFF3CD','color':'#856404'};
-    } else if (params.value === 'Cancelado') {
-        return {'backgroundColor':'#D4EDDA','color':'#155724'};
-    }
-}
-""")
-gb.configure_column("Estado", cellStyle=cell_style)
-
-gb.configure_side_bar()
-gb.configure_pagination(paginationPageSize=20)
-grid_options = gb.build()
-
-AgGrid(
-    df_detalle,
-    gridOptions=grid_options,
-    enable_enterprise_modules=True,
-    allow_unsafe_jscode=True,
-    fit_columns_on_grid_load=True,
-    theme='alpine',
-    height=500
-)
-
-st.markdown("---")
