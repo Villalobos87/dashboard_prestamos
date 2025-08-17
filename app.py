@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from st_aggrid import AgGrid, GridOptionsBuilder
-import calendar
-import locale
+from st_aggrid.shared import JsCode
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
@@ -43,23 +42,26 @@ col4.metric("Ganancias Totales", f"${ganancias_proyectadas:,.2f}")
 
 st.markdown("---")
 
-# --- Preparar datos para gráfico mensual ---
-locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')  # Para Linux/mac
-# Para Windows usar: 'Spanish_Spain.1252'
+# --- Meses en español sin usar locale ---
+meses_ingles = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"]
+meses_espanol = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                 "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+dicc_meses = dict(zip(meses_ingles, meses_espanol))
 
 df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
 df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
-df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')  # Mes en español
+df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')  # Mes en inglés
+df_filtrado['Mes'] = df_filtrado['Mes'].map(dicc_meses)
+df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=meses_espanol, ordered=True)
 
-orden_meses = list(calendar.month_name)[1:]  # Enero a Diciembre
-df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
-
+# --- Resumen mensual ---
 resumen_mensual = df_filtrado.groupby(['Año','Mes_Num','Mes'], observed=True)[['Interes','Comisión']].sum().reset_index()
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
 resumen_mensual = resumen_mensual.sort_values(['Año','Mes_Num'])
 resumen_mensual['Mes_Año'] = resumen_mensual['Mes'].astype(str) + ' ' + resumen_mensual['Año'].astype(str)
 
-# --- Gráfico mensual interactivo ---
+# --- Gráfico mensual ---
 fig_bar = px.bar(
     resumen_mensual,
     x='Mes_Año',
@@ -75,7 +77,7 @@ st.plotly_chart(fig_bar, use_container_width=True)
 
 st.markdown("---")
 
-# --- Gráfico de pastel / sunburst interactivo ---
+# --- Gráfico sunburst de ganancias por Campus y Estado ---
 ganancias_campus = df_filtrado.groupby(['Campus','Estado'])[['Interes','Comisión']].sum().reset_index()
 ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
 
@@ -92,7 +94,7 @@ st.plotly_chart(fig_sunburst, use_container_width=True)
 
 st.markdown("---")
 
-# --- Tabla detalle de préstamos con AgGrid ---
+# --- Tabla detallada con AgGrid ---
 st.subheader("📋 Detalle de Préstamos")
 df_detalle = df_filtrado.copy()
 
@@ -103,8 +105,8 @@ gb.configure_default_column(
     resizable=True,
     editable=False
 )
+
 # Resaltado condicional por estado
-from st_aggrid.shared import JsCode
 cell_style = JsCode("""
 function(params) {
     if (params.value === 'Pendiente') {
