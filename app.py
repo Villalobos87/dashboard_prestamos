@@ -62,7 +62,7 @@ resumen_mensual = (
 )
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
 resumen_mensual = resumen_mensual.sort_values(['Año','Mes_Num'])
-resumen_mensual['Mes_Año'] = resumen_mensual['Mes'] + ' ' + resumen_mensual['Año'].astype(str)
+resumen_mensual['Mes_Año'] = resumen_mensual['Mes'].astype(str) + ' ' + resumen_mensual['Año'].astype(str)
 
 # --- Gráfico mensual ---
 fig_bar = px.bar(
