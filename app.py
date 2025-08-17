@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import st_aggrid as AgGrid
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
@@ -65,14 +66,37 @@ col4.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# --- Gráfico: Ganancias Mensuales (Interes y Comisión) ---
+# --- Preparar datos ---
 df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
-df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B') # Nombre del mes
+df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
+df_filtrado['Mes_Anio'] = df_filtrado['Fecha'].dt.strftime('%B %Y')
 
-# Ordenar meses para el gráfico
-orden_meses = ["January", "February", "March", "April", "May", "June",
-               "July", "August", "September", "October", "November", "December"]
-df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
+# Ordenar la columna Mes_Anio cronológicamente
+df_filtrado = df_filtrado.sort_values('Fecha')
+
+# --- Gráfico para 2025 ---
+df_2025 = df_filtrado[df_filtrado['Año'] == 2025]
+
+plt.figure()
+plt.plot(df_2025['Mes_Anio'], df_2025['Ganancia'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.title('Ganancias Mensuales – 2025')
+plt.xlabel('Mes')
+plt.ylabel('Ganancia')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# --- Gráfico para 2026 ---
+df_2026 = df_filtrado[df_filtrado['Año'] == 2026]
+
+plt.figure()
+plt.plot(df_2026['Mes_Anio'], df_2026['Ganancia'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.title('Ganancias Mensuales – 2026')
+plt.xlabel('Mes')
+plt.ylabel('Ganancia')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 # Agrupar por Mes y calcular sumas
 resumen_mensual = df_filtrado.groupby('Mes', observed=True)[['Interes', 'Comisión']].sum().reset_index()
