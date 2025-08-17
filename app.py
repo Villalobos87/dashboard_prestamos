@@ -71,48 +71,39 @@ df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
 df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
 df_filtrado['Mes_Anio'] = df_filtrado['Fecha'].dt.strftime('%B %Y')
 
-# Ordenar la columna Mes_Anio cronológicamente
+# Crear columna Ganancia
+df_filtrado['Ganancia'] = df_filtrado['Interes'] + df_filtrado['Comisión']
+
 df_filtrado = df_filtrado.sort_values('Fecha')
 
 # --- Gráfico para 2025 ---
 df_2025 = df_filtrado[df_filtrado['Año'] == 2025]
-
 plt.figure()
-plt.plot(df_2025['Mes_Anio'], df_2025['ganancias_proyectadas'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.plot(df_2025['Mes_Anio'], df_2025['Ganancia'])
 plt.title('Ganancias Mensuales – 2025')
 plt.xlabel('Mes')
 plt.ylabel('Ganancia')
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.show()
+st.pyplot(plt)
 
 # --- Gráfico para 2026 ---
 df_2026 = df_filtrado[df_filtrado['Año'] == 2026]
-
 plt.figure()
-plt.plot(df_2026['Mes_Anio'], df_2026['ganancias_proyectadas'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.plot(df_2026['Mes_Anio'], df_2026['Ganancia'])
 plt.title('Ganancias Mensuales – 2026')
 plt.xlabel('Mes')
 plt.ylabel('Ganancia')
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.show()
+st.pyplot(plt)
 
-# Agrupar por Mes y calcular sumas
-resumen_mensual = df_filtrado.groupby('Mes', observed=True)[['Interes', 'Comisión']].sum().reset_index()
-
-# Calcular Total_Ganancias
+# Agrupar por Mes_Anio y calcular sumas
+resumen_mensual = df_filtrado.groupby('Mes_Anio', observed=True)[['Interes', 'Comisión']].sum().reset_index()
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
-# --- FIN DEL NUEVO CÓDIGO ---
 
-# Ahora, para tu gráfico:
-fig= px.bar(resumen_mensual,
-    x="Mes",
-    y="Total_Ganancias", # Usamos la nueva columna combinada
-    )
-
-
-st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostrando el gráfico
+fig = px.bar(resumen_mensual, x="Mes_Anio", y="Total_Ganancias")
+st.plotly_chart(fig, use_container_width=True)
 
 # --- Tabla ---
 
