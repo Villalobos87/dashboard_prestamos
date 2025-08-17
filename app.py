@@ -92,34 +92,28 @@ col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
-# --- Tabla detallada de préstamos (Estado por defecto = Pendiente) ---
+# --- Tabla detallada de préstamos (solo pendientes) ---
 st.subheader("📋 Detalle de Préstamos")
-df_detalle = df_filtrado.copy()
+
+# Filtrar solo pendientes desde el DataFrame
+df_detalle = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
+
+# Quitar columnas innecesarias
 cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
 df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
 
+# Construir AgGrid
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
 
+# Resaltado condicional por estado (opcional, aunque todos serán pendientes)
+from st_aggrid.shared import JsCode
 cell_style = JsCode("""
 function(params) {
-    if (params.value === 'Pendiente') {
-        return {'backgroundColor':'#FFF3CD','color':'#856404'};
-    } else if (params.value === 'Cancelado') {
-        return {'backgroundColor':'#D4EDDA','color':'#155724'};
-    }
+    return {'backgroundColor':'#FFF3CD','color':'#856404'};
 }
 """)
 gb.configure_column("Estado", cellStyle=cell_style)
-
-# Filtro por defecto: Estado = Pendiente
-default_filter_model = {
-    "Estado": {
-        "filterType": "set",
-        "values": ["Pendiente"]
-    }
-}
-gb.configure_grid_options(defaultColFilterModel=default_filter_model)
 
 gb.configure_side_bar()
 gb.configure_pagination(paginationPageSize=20)
@@ -135,10 +129,8 @@ AgGrid(
     height=500
 )
 
-st.markdown("---")
-
 # --- Tabla resumen por campus y alumno ---
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus")
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
