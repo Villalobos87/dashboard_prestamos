@@ -74,6 +74,23 @@ orden_meses = ["January", "February", "March", "April", "May", "June",
                "July", "August", "September", "October", "November", "December"]
 df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
 
+# Agrupar por Mes y calcular sumas
+resumen_mensual = df_filtrado.groupby('Mes', observed=True)[['Interes', 'Comisión']].sum().reset_index()
+
+# Calcular Total_Ganancias
+resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
+# --- FIN DEL NUEVO CÓDIGO ---
+
+# Ahora, para tu gráfico:
+fig= px.bar(resumen_mensual,
+    x="Mes",
+    y="Total_Ganancias", # Usamos la nueva columna combinada
+    )
+
+
+st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostrando el gráfico
+
+
 
 # --- Tabla ---
 
