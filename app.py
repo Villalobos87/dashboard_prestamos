@@ -78,7 +78,7 @@ df_filtrado = df_filtrado.sort_values('Fecha')
 df_2025 = df_filtrado[df_filtrado['Año'] == 2025]
 
 plt.figure()
-plt.plot(df_2025['Mes_Anio'], df_2025['Ganancia'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.plot(df_2025['Mes_Anio'], df_2025['ganancias_proyectadas'])  # cambia "Ganancia" por el nombre de tu campo de interés
 plt.title('Ganancias Mensuales – 2025')
 plt.xlabel('Mes')
 plt.ylabel('Ganancia')
@@ -90,7 +90,7 @@ plt.show()
 df_2026 = df_filtrado[df_filtrado['Año'] == 2026]
 
 plt.figure()
-plt.plot(df_2026['Mes_Anio'], df_2026['Ganancia'])  # cambia "Ganancia" por el nombre de tu campo de interés
+plt.plot(df_2026['Mes_Anio'], df_2026['ganancias_proyectadas'])  # cambia "Ganancia" por el nombre de tu campo de interés
 plt.title('Ganancias Mensuales – 2026')
 plt.xlabel('Mes')
 plt.ylabel('Ganancia')
