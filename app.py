@@ -69,7 +69,13 @@ col4.markdown(f"""
 # --- Preparar datos ---
 df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
 df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
+# Mes y año en español
 df_filtrado['Mes_Anio'] = df_filtrado['Fecha'].dt.strftime('%B %Y')
+# Reemplazar meses en inglés por español
+meses_map = {'January':'Enero','February':'Febrero','March':'Marzo','April':'Abril','May':'Mayo','June':'Junio','July':'Julio','August':'Agosto','September':'Septiembre','October':'Octubre','November':'Noviembre','December':'Diciembre'}
+df_filtrado['Mes_Anio'] = df_filtrado['Mes_Anio'].replace(meses_map, regex=True)
+# Agregar columna para orden
+df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
 
 # Crear columna Ganancia
 df_filtrado['Ganancia'] = df_filtrado['Interes'] + df_filtrado['Comisión']
