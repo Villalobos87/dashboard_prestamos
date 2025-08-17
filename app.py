@@ -254,3 +254,19 @@ AgGrid(
         theme="alpine",
         height=600
     )
+
+# --- Gráfico de pastel: Ganancias por Campus ---
+# Agrupar ganancias por Campus
+ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
+ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
+
+# Crear gráfico de pastel
+fig_pie = px.pie(
+    ganancias_campus,
+    names='Campus',
+    values='Total_Ganancias',
+    title='Distribución de Ganancias por Campus',
+    color_discrete_sequence=px.colors.qualitative.Pastel
+)
+
+st.plotly_chart(fig_pie, use_container_width=True)
