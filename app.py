@@ -87,8 +87,8 @@ resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensua
 # Ordenar por Año y Mes_Num
 resumen_mensual = resumen_mensual.sort_values(['Año', 'Mes_Num'])
 
-# Crear etiqueta combinada para el eje X
-resumen_mensual['Mes_Año'] = resumen_mensual['Mes'] + ' ' + resumen_mensual['Año'].astype(str)
+# Crear etiqueta combinada para el eje X (convertir Mes a string primero)
+resumen_mensual['Mes_Año'] = resumen_mensual['Mes'].astype(str) + ' ' + resumen_mensual['Año'].astype(str)
 
 # Gráfico
 fig = px.bar(resumen_mensual,
