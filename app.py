@@ -65,30 +65,37 @@ col4.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# --- Gráfico: Ganancias Mensuales (Interes y Comisión) ---
+# Convertir a datetime
 df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
-df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B') # Nombre del mes
 
-# Ordenar meses para el gráfico
+# Crear columnas de Año y Mes
+df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
+df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
+df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')  # Nombre del mes
+
+# Ordenar meses para visualización
 orden_meses = ["January", "February", "March", "April", "May", "June",
                "July", "August", "September", "October", "November", "December"]
 df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
 
-# Agrupar por Mes y calcular sumas
-resumen_mensual = df_filtrado.groupby('Mes', observed=True)[['Interes', 'Comisión']].sum().reset_index()
+# Agrupar por Año y Mes
+resumen_mensual = df_filtrado.groupby(['Año', 'Mes_Num', 'Mes'], observed=True)[['Interes', 'Comisión']].sum().reset_index()
 
-# Calcular Total_Ganancias
+# Calcular total
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
-# --- FIN DEL NUEVO CÓDIGO ---
 
-# Ahora, para tu gráfico:
-fig= px.bar(resumen_mensual,
-    x="Mes",
-    y="Total_Ganancias", # Usamos la nueva columna combinada
-    )
+# Ordenar por Año y Mes_Num
+resumen_mensual = resumen_mensual.sort_values(['Año', 'Mes_Num'])
 
+# Crear etiqueta combinada para el eje X
+resumen_mensual['Mes_Año'] = resumen_mensual['Mes'] + ' ' + resumen_mensual['Año'].astype(str)
 
-st.plotly_chart(fig, use_container_width=True) # Asegúrate de que estás mostrando el gráfico
+# Gráfico
+fig = px.bar(resumen_mensual,
+             x="Mes_Año",
+             y="Total_Ganancias")
+
+st.plotly_chart(fig, use_container_width=True)
 
 
 # --- Tabla ---
