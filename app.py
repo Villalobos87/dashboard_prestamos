@@ -101,6 +101,7 @@ df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
 
+# Resaltado condicional por estado
 cell_style = JsCode("""
 function(params) {
     if (params.value === 'Pendiente') {
@@ -111,17 +112,30 @@ function(params) {
 }
 """)
 gb.configure_column("Estado", cellStyle=cell_style)
+
+# --- FILTRO POR DEFECTO: Estado = Pendiente ---
+default_filter_model = {
+    "Estado": {
+        "filterType": "set",
+        "values": ["Pendiente"]
+    }
+}
+gb.configure_grid_options(defaultColFilterModel=default_filter_model)
+
 gb.configure_side_bar()
 gb.configure_pagination(paginationPageSize=20)
 grid_options = gb.build()
 
-AgGrid(df_detalle, gridOptions=grid_options, enable_enterprise_modules=True,
-       allow_unsafe_jscode=True, fit_columns_on_grid_load=True, theme='alpine', height=500)
-
-st.markdown("---")
-
-st.markdown("---")
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+AgGrid(
+    df_detalle,
+    gridOptions=grid_options,
+    enable_enterprise_modules=True,
+    allow_unsafe_jscode=True,
+    fit_columns_on_grid_load=True,
+    theme='alpine',
+    height=500
+)
+st.subheader("📊 Resumen de Cuotas Pendientes")
 
 # Filtrar solo pendientes
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
