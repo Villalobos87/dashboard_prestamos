@@ -92,26 +92,41 @@ col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
-# --- Gráfico sunburst de ganancias por Campus y Estado ---
-ganancias_campus = df_filtrado.groupby(['Campus','Estado'])[['Interes','Comisión']].sum().reset_index()
+# --- Gráfico de pastel: Ganancias por Campus simplificado ---
+ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
 ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
 
-fig_sunburst = px.sunburst(
+fig_pie = px.pie(
     ganancias_campus,
-    path=['Campus','Estado'],
+    names='Campus',
     values='Total_Ganancias',
-    color='Total_Ganancias',
-    color_continuous_scale='Viridis',
-    title="📊 Ganancias por Campus y Estado"
+    title='<b>📊 Distribución de Ganancias por Campus</b>',
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+    hole=0
 )
-fig_sunburst.update_layout(height=600)
-st.plotly_chart(fig_sunburst, use_container_width=True)
 
-st.markdown("---")
+# Mostrar valor y porcentaje en el gráfico
+fig_pie.update_traces(
+    texttemplate="%{label}: %{value:,.2f} (%{percent})",
+    textfont=dict(size=14, color='black'),
+    pull=[0.05]*len(ganancias_campus),
+    hovertemplate="%{label}<br>Ganancias: %{value:,.2f}<br>%{percent}"
+)
 
-# --- Tabla detallada con AgGrid ---
+fig_pie.update_layout(
+    title=dict(font=dict(size=24)),
+    height=700,
+)
+
+st.plotly_chart(fig_pie, use_container_width=True)
+
+# --- Tabla detallada con AgGrid (simplificada) ---
 st.subheader("📋 Detalle de Préstamos")
 df_detalle = df_filtrado.copy()
+
+# Ocultar columnas innecesarias
+cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
+df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
 
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(
@@ -146,3 +161,5 @@ AgGrid(
     theme='alpine',
     height=500
 )
+
+st.markdown("---")
