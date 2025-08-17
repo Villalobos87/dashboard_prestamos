@@ -95,18 +95,23 @@ st.markdown("---")
 # --- Tabla detallada de préstamos (solo pendientes) ---
 st.subheader("📋 Detalle de Préstamos")
 
-# Filtrar solo pendientes desde el DataFrame
+# Filtrar solo pendientes
 df_detalle = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 
 # Quitar columnas innecesarias
 cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
 df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
 
+# Formatear columnas
+df_detalle["Fecha"] = df_detalle["Fecha"].dt.strftime("%Y-%m-%d")
+for col in ["Principal", "Comisión", "Interes", "Cuota"]:
+    df_detalle[col] = df_detalle[col].map("{:,.2f}".format)
+
 # Construir AgGrid
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
 
-# Resaltado condicional por estado (opcional, aunque todos serán pendientes)
+# Resaltado condicional por estado (todos pendientes)
 from st_aggrid.shared import JsCode
 cell_style = JsCode("""
 function(params) {
