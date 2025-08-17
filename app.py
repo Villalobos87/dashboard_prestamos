@@ -74,8 +74,8 @@ df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
 df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')  # Nombre del mes
 
 # Ordenar meses para visualización
-orden_meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+orden_meses = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
 df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
 
 # Agrupar por Año y Mes
