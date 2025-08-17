@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import st_aggrid as AgGrid
-import calendar
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
@@ -66,37 +65,14 @@ col4.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# Asegurarse de que la fecha es datetime
+# --- Gráfico: Ganancias Mensuales (Interes y Comisión) ---
 df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
+df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B') # Nombre del mes
 
-# Crear columnas de Año y Mes
-df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
-df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
-df_filtrado['Mes_Nombre'] = df_filtrado['Mes_Num'].apply(lambda x: calendar.month_name[x])  # Enero, Febrero, etc.
-
-# Crear columna combinada "Mes_Año" en español
-df_filtrado['Mes_Año'] = df_filtrado['Mes_Nombre'] + '-' + df_filtrado['Año'].astype(str)
-
-# Ordenar por fecha para que el gráfico sea cronológico
-df_filtrado = df_filtrado.sort_values(['Año', 'Mes_Num'])
-
-# Agrupar por Mes_Año y sumar Interés + Comisión
-resumen_mensual = df_filtrado.groupby(['Mes_Año', 'Año', 'Mes_Num'], as_index=False)[['Interes', 'Comisión']].sum()
-resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
-
-# Crear gráfico
-import plotly.express as px
-
-fig = px.bar(resumen_mensual,
-             x='Mes_Año',
-             y='Total_Ganancias',
-             text='Total_Ganancias')
-
-# Mejorar orden en el eje X
-fig.update_xaxes(categoryorder='array', categoryarray=resumen_mensual['Mes_Año'])
-
-st.plotly_chart(fig, use_container_width=True)
-
+# Ordenar meses para el gráfico
+orden_meses = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
+df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
 
 
 # --- Tabla ---
