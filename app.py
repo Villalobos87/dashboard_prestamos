@@ -14,10 +14,8 @@ df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
 df["Nombre y Apellido"] = df["Nombre y Apellido"].astype(str)
 df["Campus"] = df["Campus"].astype(str)
 df["Estado"] = df["Estado"].astype(str)
-df["Principal"] = pd.to_numeric(df["Principal"], errors="coerce")
-df["Interes"] = pd.to_numeric(df["Interes"], errors="coerce")
-df["Comisión"] = pd.to_numeric(df["Comisión"], errors="coerce")
-df["Cuota"] = pd.to_numeric(df["Cuota"], errors="coerce")
+for col in ["Principal", "Interes", "Comisión", "Cuota"]:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
 
 # --- Sidebar filtros ---
 st.sidebar.header("Filtros")
@@ -56,10 +54,15 @@ df_filtrado['Mes'] = df_filtrado['Mes'].map(dicc_meses)
 df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=meses_espanol, ordered=True)
 
 # --- Resumen mensual ---
-resumen_mensual = df_filtrado.groupby(['Año','Mes_Num','Mes'], observed=True)[['Interes','Comisión']].sum().reset_index()
+resumen_mensual = (
+    df_filtrado
+    .groupby(['Año','Mes_Num','Mes'], observed=True)[['Interes','Comisión']]
+    .sum()
+    .reset_index()
+)
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
 resumen_mensual = resumen_mensual.sort_values(['Año','Mes_Num'])
-resumen_mensual['Mes_Año'] = resumen_mensual['Mes'].astype(str) + ' ' + resumen_mensual['Año'].astype(str)
+resumen_mensual['Mes_Año'] = resumen_mensual['Mes'] + ' ' + resumen_mensual['Año'].astype(str)
 
 # --- Gráfico mensual ---
 fig_bar = px.bar(
@@ -92,29 +95,25 @@ col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
-# --- Tabla detallada de préstamos (solo pendientes) ---
+# --- Detalle de Préstamos (solo pendientes + formato) ---
 st.subheader("📋 Detalle de Préstamos")
-
-# Filtrar solo pendientes
 df_detalle = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 
-# Quitar columnas innecesarias
+# Formato fecha
+df_detalle["Fecha"] = df_detalle["Fecha"].dt.strftime("%Y-%m-%d")
+# Formato cantidades numéricas
+for col in ["Principal", "Comisión", "Interes", "Cuota"]:
+    df_detalle[col] = df_detalle[col].map(lambda x: f"{x:,.2f}")
+
 cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
 df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df_detalle.columns])
 
-# Formatear columnas
-df_detalle["Fecha"] = df_detalle["Fecha"].dt.strftime("%Y-%m-%d")
-for col in ["Principal", "Comisión", "Interes", "Cuota"]:
-    df_detalle[col] = df_detalle[col].map("{:,.2f}".format)
-
-# Construir AgGrid
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
 
-# Resaltado condicional por estado (todos pendientes)
-from st_aggrid.shared import JsCode
+# Resaltado condicional
 cell_style = JsCode("""
-function(params) {
+function(params){
     return {'backgroundColor':'#FFF3CD','color':'#856404'};
 }
 """)
@@ -134,36 +133,27 @@ AgGrid(
     height=500
 )
 
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+st.markdown("---")
 
+# --- Resumen de Cuotas Pendientes por Campus y Alumno (con formato decimal + separador miles) ---
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
 gb = GridOptionsBuilder.from_dataframe(df_resumen)
 gb.configure_default_column(
-    enablePivot=True,
-    enableValue=True,
-    enableRowGroup=True,
-    filter=True,
-    sortable=True,
-    resizable=True
+    enablePivot=True, enableValue=True, enableRowGroup=True,
+    filter=True, sortable=True, resizable=True
 )
-
-# Agrupar por Campus y Alumno
 gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
 gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
-
-# Valor agregado con formato decimal
 gb.configure_column(
     "Cuota",
     value=True,
     aggFunc="sum",
-    valueFormatter="function(params){return Number(params.value).toFixed(2);}"
+    valueFormatter="function(params){return Number(params.value).toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});}"
 )
-
-# Ocultar las columnas originales
-gb.configure_columns(["Campus", "Nombre y Apellido"], hide=True)
-
+gb.configure_columns(["Campus","Nombre y Apellido"], hide=True)
 gb.configure_side_bar()
 grid_options = gb.build()
 
@@ -176,6 +166,8 @@ AgGrid(
     theme="alpine",
     height=500
 )
+
+st.markdown("---")
 
 # --- Gráfico de pastel: Ganancias por Campus ---
 ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
