@@ -134,8 +134,8 @@ AgGrid(
     height=500
 )
 
-# --- Tabla resumen por campus y alumno ---
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus")
+# --- Tabla resumen por campus y alumno (sin columnas vacías) ---
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
@@ -148,11 +148,15 @@ gb.configure_default_column(
     sortable=True,
     resizable=True
 )
+
+# Agrupar por Campus y Alumno
 gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
 gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
 gb.configure_column("Cuota", value=True, aggFunc="sum")
-gb.configure_column("Campus", pinned="left")
-gb.configure_column("Nombre y Apellido", pinned="left")
+
+# ❗Ocultar las columnas originales para que solo quede la columna "Group" y el total
+gb.configure_columns(["Campus", "Nombre y Apellido"], hide=True)
+
 gb.configure_side_bar()
 grid_options = gb.build()
 
@@ -165,8 +169,6 @@ AgGrid(
     theme="alpine",
     height=500
 )
-
-st.markdown("---")
 
 # --- Gráfico de pastel: Ganancias por Campus ---
 ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
