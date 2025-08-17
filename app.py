@@ -256,17 +256,25 @@ AgGrid(
     )
 
 # --- Gráfico de pastel: Ganancias por Campus ---
-# Agrupar ganancias por Campus
 ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
 ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
 
-# Crear gráfico de pastel
+# Crear gráfico de pastel con valores y porcentaje
 fig_pie = px.pie(
     ganancias_campus,
     names='Campus',
     values='Total_Ganancias',
     title='Distribución de Ganancias por Campus',
-    color_discrete_sequence=px.colors.qualitative.Pastel
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+    hole=0  # para pastel completo; si quieres donut pon 0.4 por ejemplo
 )
 
-st.plotly_chart(fig_pie, use_container_width=True)
+# Mostrar porcentaje y valor en las etiquetas
+fig_pie.update_traces(
+    textinfo='label+percent+value',
+    textfont_size=16,
+    pull=[0.05]*len(ganancias_campus)  # opcional: separa ligeramente los sectores
+)
+
+# Ajustar tamaño del gráfico
+st.plotly_chart(fig_pie, use_container_width=True, height=600)
