@@ -92,7 +92,7 @@ col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
-# --- Tabla detallada de préstamos (simplificada) ---
+# --- Tabla detallada de préstamos (Estado por defecto = Pendiente) ---
 st.subheader("📋 Detalle de Préstamos")
 df_detalle = df_filtrado.copy()
 cols_a_ocultar = ["Cheque", "Fecha de Inicio", "Fecha de Finalización", "Año", "Mes_Num", "Mes"]
@@ -101,7 +101,6 @@ df_detalle = df_detalle.drop(columns=[col for col in cols_a_ocultar if col in df
 gb = GridOptionsBuilder.from_dataframe(df_detalle)
 gb.configure_default_column(filter=True, sortable=True, resizable=True, editable=False)
 
-# Resaltado condicional por estado
 cell_style = JsCode("""
 function(params) {
     if (params.value === 'Pendiente') {
@@ -113,7 +112,7 @@ function(params) {
 """)
 gb.configure_column("Estado", cellStyle=cell_style)
 
-# --- FILTRO POR DEFECTO: Estado = Pendiente ---
+# Filtro por defecto: Estado = Pendiente
 default_filter_model = {
     "Estado": {
         "filterType": "set",
@@ -135,15 +134,14 @@ AgGrid(
     theme='alpine',
     height=500
 )
-st.subheader("📊 Resumen de Cuotas Pendientes")
 
-# Filtrar solo pendientes
+st.markdown("---")
+
+# --- Tabla resumen por campus y alumno ---
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
-
-# Seleccionar solo columnas necesarias
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
-# Construir AgGrid con agrupación
 gb = GridOptionsBuilder.from_dataframe(df_resumen)
 gb.configure_default_column(
     enablePivot=True,
@@ -153,19 +151,11 @@ gb.configure_default_column(
     sortable=True,
     resizable=True
 )
-
-# Agrupar por Campus y luego Alumno
 gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
 gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
 gb.configure_column("Cuota", value=True, aggFunc="sum")
-
-# Pinned columns
 gb.configure_column("Campus", pinned="left")
 gb.configure_column("Nombre y Apellido", pinned="left")
-
-# Ocultar columnas que no se necesitan
-gb.configure_columns([], hide=True)
-
 gb.configure_side_bar()
 grid_options = gb.build()
 
@@ -178,3 +168,26 @@ AgGrid(
     theme="alpine",
     height=500
 )
+
+st.markdown("---")
+
+# --- Gráfico de pastel: Ganancias por Campus ---
+ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
+ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
+
+fig_pie = px.pie(
+    ganancias_campus,
+    names='Campus',
+    values='Total_Ganancias',
+    title='<b>📊 Distribución de Ganancias por Campus</b>',
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+    hole=0
+)
+fig_pie.update_traces(
+    texttemplate="%{label}: %{value:,.2f} (%{percent})",
+    textfont=dict(size=14, color='black'),
+    pull=[0.05]*len(ganancias_campus),
+    hovertemplate="%{label}<br>Ganancias: %{value:,.2f}<br>%{percent}"
+)
+fig_pie.update_layout(title=dict(font=dict(size=24)), height=700)
+st.plotly_chart(fig_pie, use_container_width=True)
