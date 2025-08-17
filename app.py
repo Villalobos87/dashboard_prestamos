@@ -272,7 +272,7 @@ fig_pie = px.pie(
 # Mostrar porcentaje y valor en formato decimal, nombre en negrita
 fig_pie.update_traces(
     texttemplate="%{label}: %{value:,.2f} (%{percent})",  # valor con 2 decimales y porcentaje
-    textfont=dict(size=16, family="Arial, sans-serif", color='black'),
+    textfont=dict(size=12, family="Arial, sans-serif", color='black'),
     pull=[0.05]*len(ganancias_campus),
     hovertemplate="%{label}<br>Ganancias: %{value:,.2f}<br>%{percent}"  # hover con valor decimal
 )
