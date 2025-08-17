@@ -28,7 +28,7 @@ df_filtrado = df[(df["Estado"].isin(estado)) & (df["Campus"].isin(campus))]
 # --- Título ---
 st.title("📊 Dashboard de Préstamos")
 
-# --- Métricas generales ---
+# --- BLOQUE 1: Métricas generales ---
 total_prestado = df_filtrado['Principal'].sum()
 total_interes = df_filtrado['Interes'].sum()
 total_comision = df_filtrado['Comisión'].sum()
@@ -51,7 +51,7 @@ dicc_meses = dict(zip(meses_ingles, meses_espanol))
 
 df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
 df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
-df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')  # Mes en inglés
+df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B')
 df_filtrado['Mes'] = df_filtrado['Mes'].map(dicc_meses)
 df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=meses_espanol, ordered=True)
 
@@ -74,6 +74,21 @@ fig_bar = px.bar(
 fig_bar.update_traces(texttemplate='%{text:,.2f}', textposition='outside')
 fig_bar.update_layout(height=500)
 st.plotly_chart(fig_bar, use_container_width=True)
+
+st.markdown("---")
+
+# --- BLOQUE 2: Métricas adicionales ---
+total_cuota_cancelada = df[df["Estado"]=="Cancelado"]["Cuota"].sum()
+Capital_Inicial = 9000
+Ganancias_Entregadas = 3698.24 - 698.24
+Efectivo = total_cuota_cancelada + Capital_Inicial - total_prestado - Ganancias_Entregadas
+Pendiente_Recuperar = df[df["Estado"]=="Pendiente"]["Cuota"].sum()
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Yanina Orochena", f"${Efectivo:,.2f}")
+col2.metric("Por Recuperar", f"${Pendiente_Recuperar:,.2f}")
+col3.metric("Capital", f"${Capital_Inicial:,.2f}")
+col4.metric("Rodrigo Gurdian", f"${Ganancias_Entregadas:,.2f}")
 
 st.markdown("---")
 
