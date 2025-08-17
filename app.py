@@ -76,28 +76,6 @@ df_filtrado['Ganancia'] = df_filtrado['Interes'] + df_filtrado['Comisión']
 
 df_filtrado = df_filtrado.sort_values('Fecha')
 
-# --- Gráfico para 2025 ---
-df_2025 = df_filtrado[df_filtrado['Año'] == 2025]
-plt.figure()
-plt.plot(df_2025['Mes_Anio'], df_2025['Ganancia'])
-plt.title('Ganancias Mensuales – 2025')
-plt.xlabel('Mes')
-plt.ylabel('Ganancia')
-plt.xticks(rotation=45)
-plt.tight_layout()
-st.pyplot(plt)
-
-# --- Gráfico para 2026 ---
-df_2026 = df_filtrado[df_filtrado['Año'] == 2026]
-plt.figure()
-plt.plot(df_2026['Mes_Anio'], df_2026['Ganancia'])
-plt.title('Ganancias Mensuales – 2026')
-plt.xlabel('Mes')
-plt.ylabel('Ganancia')
-plt.xticks(rotation=45)
-plt.tight_layout()
-st.pyplot(plt)
-
 # Agrupar por Mes_Anio y calcular sumas
 resumen_mensual = df_filtrado.groupby('Mes_Anio', observed=True)[['Interes', 'Comisión']].sum().reset_index()
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
