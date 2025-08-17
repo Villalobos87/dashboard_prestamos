@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import st_aggrid as AgGrid
-import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
@@ -66,31 +65,15 @@ col4.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# --- Preparar datos ---
+# --- Gráfico: Ganancias Mensuales (Interes y Comisión) ---
 df_filtrado['Fecha'] = pd.to_datetime(df_filtrado['Fecha'], errors='coerce')
-df_filtrado['Año'] = df_filtrado['Fecha'].dt.year
-# Mes y año en español
-df_filtrado['Mes_Anio'] = df_filtrado['Fecha'].dt.strftime('%B %Y')
-# Reemplazar meses en inglés por español
-meses_map = {'January':'Enero','February':'Febrero','March':'Marzo','April':'Abril','May':'Mayo','June':'Junio','July':'Julio','August':'Agosto','September':'Septiembre','October':'Octubre','November':'Noviembre','December':'Diciembre'}
-df_filtrado['Mes_Anio'] = df_filtrado['Mes_Anio'].replace(meses_map, regex=True)
-# Agregar columna para orden
-df_filtrado['Mes_Num'] = df_filtrado['Fecha'].dt.month
+df_filtrado['Mes'] = df_filtrado['Fecha'].dt.strftime('%B') # Nombre del mes
 
-# Crear columna Ganancia
-df_filtrado['Ganancia'] = df_filtrado['Interes'] + df_filtrado['Comisión']
+# Ordenar meses para el gráfico
+orden_meses = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
+df_filtrado['Mes'] = pd.Categorical(df_filtrado['Mes'], categories=orden_meses, ordered=True)
 
-df_filtrado = df_filtrado.sort_values('Fecha')
-
-# Agrupar por Mes_Anio y calcular sumas
-resumen_mensual = df_filtrado.groupby('Mes_Anio', observed=True)[['Interes', 'Comisión']].sum().reset_index()
-resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
-
-# Ordenar por Mes_Num
-resumen_mensual = resumen_mensual.sort_values('Mes_Num')
-
-fig = px.bar(resumen_mensual, x="Mes_Anio", y="Total_Ganancias")
-st.plotly_chart(fig, use_container_width=True)
 
 # --- Tabla ---
 
