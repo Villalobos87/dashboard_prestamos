@@ -136,7 +136,7 @@ AgGrid(
 st.markdown("---")
 
 # --- Resumen de Cuotas Pendientes por Campus y Alumno (con formato decimal + separador miles) ---
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus")
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
