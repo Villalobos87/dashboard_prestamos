@@ -86,6 +86,9 @@ df_filtrado = df_filtrado.sort_values('Fecha')
 resumen_mensual = df_filtrado.groupby('Mes_Anio', observed=True)[['Interes', 'Comisión']].sum().reset_index()
 resumen_mensual['Total_Ganancias'] = resumen_mensual['Interes'] + resumen_mensual['Comisión']
 
+# Ordenar por Mes_Num
+resumen_mensual = resumen_mensual.sort_values('Mes_Num')
+
 fig = px.bar(resumen_mensual, x="Mes_Anio", y="Total_Ganancias")
 st.plotly_chart(fig, use_container_width=True)
 
