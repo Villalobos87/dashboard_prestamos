@@ -277,4 +277,4 @@ fig_pie.update_traces(
 )
 
 # Ajustar tamaño del gráfico
-st.plotly_chart(fig_pie, use_container_width=True, height=600)
+st.plotly_chart(fig_pie, use_container_width=True, height=1200)
