@@ -259,22 +259,34 @@ AgGrid(
 ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
 ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
 
-# Crear gráfico de pastel con valores y porcentaje
+# --- Gráfico de pastel: Ganancias por Campus ---
+ganancias_campus = df_filtrado.groupby("Campus")[['Interes', 'Comisión']].sum().reset_index()
+ganancias_campus['Total_Ganancias'] = ganancias_campus['Interes'] + ganancias_campus['Comisión']
+
+# Crear gráfico de pastel con valores, porcentaje y nombre en negrita
 fig_pie = px.pie(
     ganancias_campus,
     names='Campus',
     values='Total_Ganancias',
-    title='Distribución de Ganancias por Campus',
+    title='<b>📊 Distribución Interactiva de Ganancias por Campus</b>',
     color_discrete_sequence=px.colors.qualitative.Pastel,
-    hole=0  # para pastel completo; si quieres donut pon 0.4 por ejemplo
+    hole=0  # Pastel completo, para donut cambiar a 0.4
 )
 
-# Mostrar porcentaje y valor en las etiquetas
+# Mostrar porcentaje, valor y nombre en negrita
 fig_pie.update_traces(
     textinfo='label+percent+value',
-    textfont_size=16,
-    pull=[0.05]*len(ganancias_campus)  # opcional: separa ligeramente los sectores
+    textfont=dict(size=16, family="Arial, sans-serif", color='black'),  # nombre del campus en negrita
+    pull=[0.05]*len(ganancias_campus)  # separa ligeramente los sectores
 )
 
+# Mejorar interactividad: al pasar el mouse muestra valores detallados
+fig_pie.update_traces(hoverinfo='label+percent+value', hoverlabel=dict(font_size=16, font_family="Arial, sans-serif"))
+
 # Ajustar tamaño del gráfico
-st.plotly_chart(fig_pie, use_container_width=True, height=1200)
+fig_pie.update_layout(
+    title=dict(font=dict(size=24)),  # título más grande
+    height=700,  # gráfico más alto
+)
+
+st.plotly_chart(fig_pie, use_container_width=True)
