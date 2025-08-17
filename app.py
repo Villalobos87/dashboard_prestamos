@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import JsCode
+from datetime import datetime
+
 
 st.set_page_config(page_title="Dashboard Préstamos", layout="wide")
 
@@ -62,16 +64,18 @@ resumen_mensual["Mes_Año"] = (
     resumen_mensual["Mes"].astype(str) + " " + resumen_mensual["Año"].astype(str)
 )
 
-# --- Selector de año + gráfico mensual ---
-anos_disponibles = sorted(resumen_mensual["Año"].unique())
+# --- Selector de año (por defecto el año actual) ---
+anos_disponibles = sorted(resumen_mensual['Año'].unique())
+anio_actual      = datetime.now().year
 
-ano_seleccionado = st.selectbox(
-    "Selecciona el Año", 
-    anos_disponibles,
-    index=len(anos_disponibles)-1
-)
+# Si el año actual está en la lista lo usamos como valor por defecto,
+# si no, usamos el último disponible
+if anio_actual in anos_disponibles:
+    ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=anos_disponibles.index(anio_actual))
+else:
+    ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=len(anos_disponibles)-1)
 
-resumen_filtrado = resumen_mensual[resumen_mensual["Año"] == ano_seleccionado]
+resumen_filtrado = resumen_mensual[resumen_mensual['Año'] == ano_seleccionado]
 
 fig_bar = px.bar(
     resumen_filtrado,
@@ -128,7 +132,7 @@ AgGrid(df_detalle, gridOptions=tbl_opts, enable_enterprise_modules=True,
 st.markdown("---")
 
 # --- Resumen (Cuotas Pendientes por Campus y Alumno) ---
-st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+st.subheader("📊 Resumen de Cuotas Pendientes por Campus")
 
 df_pend = df_filtrado[df_filtrado["Estado"]=="Pendiente"][["Campus","Nombre y Apellido","Cuota"]].copy()
 g = GridOptionsBuilder.from_dataframe(df_pend)
