@@ -134,8 +134,8 @@ AgGrid(
     height=500
 )
 
-# --- Tabla resumen por campus y alumno (sin columnas vacías) ---
 st.subheader("📊 Resumen de Cuotas Pendientes por Campus y Alumno")
+
 df_pendientes = df_filtrado[df_filtrado["Estado"]=="Pendiente"].copy()
 df_resumen = df_pendientes[["Campus", "Nombre y Apellido", "Cuota"]].copy()
 
@@ -152,9 +152,16 @@ gb.configure_default_column(
 # Agrupar por Campus y Alumno
 gb.configure_column("Campus", rowGroup=True, rowGroupIndex=0)
 gb.configure_column("Nombre y Apellido", rowGroup=True, rowGroupIndex=1)
-gb.configure_column("Cuota", value=True, aggFunc="sum")
 
-# ❗Ocultar las columnas originales para que solo quede la columna "Group" y el total
+# Valor agregado con formato decimal
+gb.configure_column(
+    "Cuota",
+    value=True,
+    aggFunc="sum",
+    valueFormatter="function(params){return Number(params.value).toFixed(2);}"
+)
+
+# Ocultar las columnas originales
 gb.configure_columns(["Campus", "Nombre y Apellido"], hide=True)
 
 gb.configure_side_bar()
