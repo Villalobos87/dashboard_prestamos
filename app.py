@@ -179,3 +179,24 @@ fig_pie.update_traces(
 )
 fig_pie.update_layout(title_font_size=24, height=700)
 st.plotly_chart(fig_pie, use_container_width=True)
+
+# --- Datos de ejemplo ---
+df = pd.DataFrame({
+    "Nombre": ["Ana", "Luis", "Carla", "Pedro", "Marta"],
+    "Edad": [25, 30, 22, 28, 35],
+    "Ciudad": ["Madrid", "Barcelona", "Sevilla", "Valencia", "Bilbao"]
+})
+
+st.title("Ejemplo de tablas en Streamlit")
+
+# --- 1️⃣ Tabla estática ---
+st.subheader("Tabla estática (st.table)")
+st.table(df)
+
+# --- 2️⃣ Tabla interactiva ---
+st.subheader("Tabla interactiva (st.dataframe)")
+st.dataframe(df, width=600, height=200)
+
+# --- 3️⃣ Tabla avanzada con AgGrid ---
+st.subheader("Tabla avanzada e interactiva (AgGrid)")
+AgGrid(df)
