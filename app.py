@@ -64,19 +64,31 @@ resumen_mensual["Mes_Año"] = (
     resumen_mensual["Mes"].astype(str) + " " + resumen_mensual["Año"].astype(str)
 )
 
-# --- Selector de año (por defecto el año actual) ---
+# --- Selector de año con suma de ganancias ---
 anos_disponibles = sorted(resumen_mensual['Año'].unique())
 anio_actual      = datetime.now().year
 
-# Si el año actual está en la lista lo usamos como valor por defecto,
-# si no, usamos el último disponible
-if anio_actual in anos_disponibles:
-    ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=anos_disponibles.index(anio_actual))
-else:
-    ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=len(anos_disponibles)-1)
+# Layout en columnas
+col1, col2 = st.columns([2,1])  # más espacio para el selectbox que para la suma
 
+with col1:
+    # Si el año actual está en la lista lo usamos como valor por defecto,
+    # si no, usamos el último disponible
+    if anio_actual in anos_disponibles:
+        ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=anos_disponibles.index(anio_actual))
+    else:
+        ano_seleccionado = st.selectbox("Selecciona el Año", anos_disponibles, index=len(anos_disponibles)-1)
+
+# Filtrar resumen por año seleccionado
 resumen_filtrado = resumen_mensual[resumen_mensual['Año'] == ano_seleccionado]
 
+# Calcular total de ganancias del año
+total_ganancias_anual = resumen_filtrado["Total_Ganancias"].sum()
+
+with col2:
+    st.metric(label="💰 Total del Año", value=f"{total_ganancias_anual:,.2f}")
+
+# --- Gráfico ---
 fig_bar = px.bar(
     resumen_filtrado,
     x="Mes_Año",
@@ -88,8 +100,6 @@ fig_bar = px.bar(
 fig_bar.update_traces(texttemplate="%{text:,.2f}", textposition="outside")
 fig_bar.update_layout(height=500, showlegend=False, coloraxis_showscale=False)
 st.plotly_chart(fig_bar, use_container_width=True)
-
-fig_bar.update_layout(showlegend=False, coloraxis_showscale=False)
 
 st.markdown("---")
 
